@@ -19,6 +19,8 @@ env:
 params:
   # SSH key is required for remote access into the container
   version: tests-passed
+  checkout: tests-passed
+  bundle_jobs: 1
 
   home: /var/www/discourse
   upload_size: 10m
@@ -92,7 +94,7 @@ run:
         - git remote set-branches --add origin master
         - git pull
         - git fetch origin $version
-        - git checkout $version
+        - git checkout $checkout
         - mkdir -p tmp/pids
         - mkdir -p tmp/sockets
         - touch tmp/.gitkeep
@@ -149,7 +151,7 @@ run:
       cd: $home
       hook: bundle_exec
       cmd:
-        - su discourse -c 'bundle install --deployment --verbose --without test --without development --retry 3 --jobs 2'
+        - su discourse -c 'bundle install --deployment --verbose --without test --without development --retry 3 --jobs $bundle_jobs'
   - exec:
       cd: $home
       hook: db_migrate
